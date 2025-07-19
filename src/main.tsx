@@ -1,10 +1,27 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import CurrencySwapForm from './components/CurrencySwapForm';
+import './index.css';
+import { ChakraProvider, createSystem, defaultConfig } from "@chakra-ui/react"
+import {QueryProvider} from "./providers/ReactQuery";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+export const system = createSystem(defaultConfig, {
+    theme: {
+        tokens: {
+            fonts: {
+                heading: { value: `'Inter', sans-serif` },
+                body: { value: `'Inter', sans-serif` },
+            },
+        },
+    },
+})
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+      <QueryProvider>
+          <ChakraProvider value={system}>
+              <CurrencySwapForm />
+          </ChakraProvider>
+      </QueryProvider>
+  </React.StrictMode>
+);
