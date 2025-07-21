@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Box, Button, Input, Flex, Select, Field, Image, IconButton} from '@chakra-ui/react';
+import {Box, Button, Input, Flex, Select, Field, Image, IconButton, Spinner} from '@chakra-ui/react';
 import {useFormik} from "formik";
 
 import {CustomErrorLabel} from "./CustomError";
@@ -79,10 +79,9 @@ const currencyList: currencyItem[] = [
 ];
 
 export default function CurrencySwapForm() {
-    const { data: currenciesData } = useCurrenciesQuery();
+    const { data: currenciesData = [] } = useCurrenciesQuery();
     const [result, setResult] = useState<string>('');
-
-    console.log(1111, currenciesData)
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -93,8 +92,35 @@ export default function CurrencySwapForm() {
         },
         validationSchema: toFormikValidationSchema(currencyFormSchema),
         onSubmit: async (values) => {
-            console.log('Form submitted with values:', values);
-        },
+            setIsLoading(true);
+
+            // NOTE: It is assumed that each currency's price is in USD
+            const fromPrice = currenciesData?.find((item) => item.currency.toLowerCase() === values.currencyFrom.toLowerCase())?.price;
+            const toPrice = currenciesData?.find((item) => item.currency.toLowerCase() === values.currencyTo.toLowerCase())?.price;
+
+            // Handle missing prices gracefully
+            if (!fromPrice || !toPrice) {
+                setResult("Conversion rate not available for selected currencies.");
+                setIsLoading(false);
+                return;
+            }
+
+            // Convert using USD intermediary:
+            // amount_in_toCurrency = (amount_in_fromCurrency * fromPrice) / toPrice
+            const converted = (values.amountToSend * fromPrice) / toPrice;
+
+            setTimeout(() => {
+                // TODO color #b6df90 to converted number
+
+                setResult(
+                    `${values.amountToSend} ${values.currencyFrom} = <span style="color:#b6df90; font-weight:bold;">${converted.toFixed(6)}</span> ${values.currencyTo}`
+                );
+
+
+                setIsLoading(false);
+            }, 1500); // simulate network delay
+        }
+
     });
 
 
@@ -133,7 +159,7 @@ export default function CurrencySwapForm() {
                         </Box>
                     </Flex>
 
-                    <Field.Root orientation="vertical" isInvalid={formik.touched.amountToSend && !!formik.errors.amountToSend}>
+                    <Field.Root orientation="vertical">
                         <Field.Label htmlFor="amountToSend" fontWeight="bold">
                             Amount
                         </Field.Label>
@@ -161,7 +187,7 @@ export default function CurrencySwapForm() {
                     >
 
                         {/* Currency From */}
-                        <Field.Root orientation="vertical" isInvalid={formik.touched.currencyFrom && !!formik.errors.currencyFrom}>
+                        <Field.Root orientation="vertical">
                             {/* Label */}
                             <Field.Label htmlFor="currencyFrom" fontWeight="bold">
                                 From Currency
@@ -194,7 +220,7 @@ export default function CurrencySwapForm() {
                         </Flex>
 
                         {/* Currency To */}
-                        <Field.Root orientation="vertical" isInvalid={formik.touched.currencyTo && !!formik.errors.currencyTo}>
+                        <Field.Root orientation="vertical">
                             <Field.Label htmlFor="currencyFrom" fontWeight="bold">
                                 To Currency
                             </Field.Label>
@@ -216,7 +242,12 @@ export default function CurrencySwapForm() {
 
                     {/* Display Result */}
                     <Box mt="40px" padding="15px" borderRadius="8px" border="1px solid rgb(228, 228, 231)" textAlign="center">
-                        <h3>{result || 'Converted amount will be displayed here.'}</h3>
+                        <Box
+                            fontSize="20px"
+                            dangerouslySetInnerHTML={{
+                                __html: result || 'Converted amount will be displayed here.',
+                            }}
+                        />
                     </Box>
 
                     {/* Custom error label */}
@@ -232,10 +263,13 @@ export default function CurrencySwapForm() {
                             bg="#9fe870"
                             type="submit"
                             visual="secondary"
-                            loading={formik.isSubmitting}
+                            isLoading={formik.isSubmitting}
                             loadingText="loading"
                         >
                             Convert money
+                            {isLoading && (
+                                <Spinner size="sm" />
+                            )}
                         </Button>
                     </Field.Root>
                 </form>
