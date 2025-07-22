@@ -1,3 +1,5 @@
+Currency Exchange
+
 ## [vite](https://vitejs.dev/) + [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/) Starter
 
 This setup includes:
