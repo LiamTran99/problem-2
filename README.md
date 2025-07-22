@@ -11,3 +11,9 @@ This setup includes:
 * https://markus.oberlehner.net/blog/using-testing-library-jest-dom-with-vitest/
 * https://testing-library.com/docs/queries/about#priority
 * https://kentcdodds.com/blog/common-mistakes-with-react-testing-library
+
+  1. Start the development server by running the following command in your terminal: 
+`npm run dev`
+  
+  2. Start the development server by running the following command in your terminal:
+`http://localhost:5173/`

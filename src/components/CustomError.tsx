@@ -3,17 +3,15 @@
 import { Box } from '@chakra-ui/react';
 
 type CustomErrorLabelProps = {
-    message?: string;
+  message?: string;
 };
 
-function CustomErrorLabel({ message }: Readonly<CustomErrorLabelProps>) {
-    return (
-        <Box mb="3" p={2} color="red">
-            {message ?? ' '}
-        </Box>
-    );
+export default function CustomErrorLabel({
+  message,
+}: Readonly<CustomErrorLabelProps>) {
+  return (
+    <Box mb="3" p={2} color="red">
+      {message ?? ' '}
+    </Box>
+  );
 }
-
-export {
-    CustomErrorLabel,
-};
